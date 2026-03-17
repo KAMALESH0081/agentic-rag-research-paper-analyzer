@@ -1,5 +1,6 @@
 from app.core.vectordb import collection
-from app.core.embeddings import model
+from app.core.embeddings import embedding_model
+from app.utils.logger import log, log_section
 
 QUERIES = [
     "What datasets were used to train the model?",
@@ -10,17 +11,30 @@ QUERIES = [
 
 def retrieve_context():
 
-    all_chunks = []
+    log_section("RETRIEVAL STAGE")
+
+    retrieval_results = {}
 
     for query in QUERIES:
 
-        query_embedding = model.encode([query])[0]
+        log_section(f"QUERY: {query}")
+
+        query_embedding = embedding_model.encode([query])[0]
 
         results = collection.query(
             query_embeddings=[query_embedding],
-            n_results=2
+            n_results=5,
+            include=["documents", "distances"]  
         )
 
-        all_chunks.extend(results["documents"][0])
+        chunks = results["documents"][0]
+        distances = results["distances"][0]
 
-    return "\n".join(all_chunks)
+        retrieval_results[query] = chunks
+
+        for i, (chunk, distance) in enumerate(zip(chunks, distances)):
+
+            log(f"\nTop {i+1}")
+            log(f"Chunk:\n{chunk[:500]}")
+
+    return retrieval_results

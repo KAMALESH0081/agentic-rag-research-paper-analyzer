@@ -104,20 +104,6 @@ genai-project/
 
 ---
 
-## Output
-
-The system generates structured JSON output. Example:
-
-```id="k3x8bn"
-{
-  "datasets_used": [...],
-  "evaluation_metrics": [...],
-  "methods": [...]
-}
-```
-
----
-
 ## Notes
 
 * Each query is processed independently to avoid context mixing
